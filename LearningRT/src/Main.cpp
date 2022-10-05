@@ -2,6 +2,7 @@
 #include "Walnut/EntryPoint.h"
 
 #include "Walnut/Image.h"
+#include "Walnut/Random.h"
 
 class RaytracingLayer : public Walnut::Layer
 {
@@ -10,7 +11,8 @@ public:
 	{
 		// Settings window
 		ImGui::Begin("Settings");
-		if (ImGui::Button("Render"))
+		ImGui::Checkbox("Render", &m_KeepRendering);
+		if (m_KeepRendering)
 			Render();
 		ImGui::End();
 
@@ -37,12 +39,13 @@ public:
 		}
 
 		for (uint32_t i = 0; i < m_ViewportWidth * m_ViewportHeight; i++)
-			m_ImageData[i] = 0xFFFF00FF;
+			m_ImageData[i] = Walnut::Random::UInt();
 
 		m_Image->SetData(m_ImageData);
 	}
 
 private:
+	bool m_KeepRendering = false;
 	uint32_t m_ViewportWidth = 0;
 	uint32_t m_ViewportHeight = 0;
 
