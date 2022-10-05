@@ -11,9 +11,9 @@ public:
 	{
 		// Settings window
 		ImGui::Begin("Settings");
-		ImGui::Checkbox("Render", &m_KeepRendering);
-		if (m_KeepRendering)
+		if (ImGui::Button("Render Once") || m_KeepRendering)
 			Render();
+		ImGui::Checkbox("Keep Rendering", &m_KeepRendering);
 		ImGui::End();
 
 		// Viewport
@@ -39,7 +39,7 @@ public:
 		}
 
 		for (uint32_t i = 0; i < m_ViewportWidth * m_ViewportHeight; i++)
-			m_ImageData[i] = Walnut::Random::UInt();
+			m_ImageData[i] = Walnut::Random::UInt() | 0xFF000000;
 
 		m_Image->SetData(m_ImageData);
 	}
