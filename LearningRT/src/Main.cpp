@@ -3,6 +3,7 @@
 
 #include "Walnut/Image.h"
 #include "Walnut/Random.h"
+#include "Walnut/Timer.h"
 
 class RaytracingLayer : public Walnut::Layer
 {
@@ -14,6 +15,7 @@ public:
 		if (ImGui::Button("Render Once") || m_KeepRendering)
 			Render();
 		ImGui::Checkbox("Keep Rendering", &m_KeepRendering);
+		ImGui::Text("Last render took %.3fms", m_LastRenderTime);
 		ImGui::End();
 
 		// Viewport
@@ -29,6 +31,8 @@ public:
 
 	void Render()
 	{
+		Walnut::Timer timer;
+
 		if (m_Image == nullptr
 			|| m_Image->GetWidth() != m_ViewportWidth
 			|| m_Image->GetHeight() != m_ViewportHeight)
@@ -42,15 +46,22 @@ public:
 			m_ImageData[i] = Walnut::Random::UInt() | 0xFF000000;
 
 		m_Image->SetData(m_ImageData);
+
+		m_LastRenderTime = timer.ElapsedMillis();
 	}
 
 private:
+	// UI State
 	bool m_KeepRendering = false;
 	uint32_t m_ViewportWidth = 0;
 	uint32_t m_ViewportHeight = 0;
 
+	// Render image
 	std::shared_ptr<Walnut::Image> m_Image;
 	uint32_t* m_ImageData = nullptr;
+
+	// Timing
+	float m_LastRenderTime = 0;
 };
 
 Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
