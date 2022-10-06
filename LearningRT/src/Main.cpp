@@ -1,8 +1,7 @@
-#include "Walnut/Application.h"
-#include "Walnut/EntryPoint.h"
+#include "Renderer.h"
 
-#include "Walnut/Image.h"
-#include "Walnut/Random.h"
+#include "Walnut/Application.h"
+#include "Walnut/EntryPoint.h" // EntryPoint must be included after Application
 #include "Walnut/Timer.h"
 
 class RaytracingLayer : public Walnut::Layer
@@ -23,8 +22,11 @@ public:
 		ImGui::Begin("Viewport");
 		m_ViewportWidth  = static_cast<uint32_t>(ImGui::GetContentRegionAvail().x);
 		m_ViewportHeight = static_cast<uint32_t>(ImGui::GetContentRegionAvail().y);
-		if (m_Image != nullptr)
-			ImGui::Image(m_Image->GetDescriptorSet(), { static_cast<float>(m_Image->GetWidth()), static_cast<float>(m_Image->GetHeight()) });
+
+		const auto image = m_Renderer.GetFinalImage();
+		if (image != nullptr)
+			ImGui::Image(image->GetDescriptorSet(), { static_cast<float>(image->GetWidth()), static_cast<float>(image->GetHeight()) });
+
 		ImGui::End();
 		ImGui::PopStyleVar();
 	}
@@ -33,19 +35,8 @@ public:
 	{
 		Walnut::Timer timer;
 
-		if (m_Image == nullptr
-			|| m_Image->GetWidth() != m_ViewportWidth
-			|| m_Image->GetHeight() != m_ViewportHeight)
-		{
-			m_Image = std::make_shared<Walnut::Image>(m_ViewportWidth, m_ViewportHeight, Walnut::ImageFormat::RGBA);
-			delete[] m_ImageData;
-			m_ImageData = new uint32_t[m_ViewportWidth * m_ViewportHeight];
-		}
-
-		for (uint32_t i = 0; i < m_ViewportWidth * m_ViewportHeight; i++)
-			m_ImageData[i] = Walnut::Random::UInt() | 0xFF000000;
-
-		m_Image->SetData(m_ImageData);
+		m_Renderer.OnResize(m_ViewportWidth, m_ViewportHeight);
+		m_Renderer.Render();
 
 		m_LastRenderTime = timer.ElapsedMillis();
 	}
@@ -56,9 +47,8 @@ private:
 	uint32_t m_ViewportWidth = 0;
 	uint32_t m_ViewportHeight = 0;
 
-	// Render image
-	std::shared_ptr<Walnut::Image> m_Image;
-	uint32_t* m_ImageData = nullptr;
+	// Renderer
+	Renderer m_Renderer;
 
 	// Timing
 	float m_LastRenderTime = 0;
