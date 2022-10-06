@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
 
 class Renderer
 {
@@ -13,6 +14,9 @@ public:
 	void Render();
 	void OnResize(uint32_t width, uint32_t height);
 	[[nodiscard]] std::shared_ptr<Walnut::Image> GetFinalImage() const;
+
+	float radius = 0.5f;
+	glm::vec3 rayOrigin = glm::vec3(0, 0, 2);
 private:
 	uint32_t PerPixel(glm::vec2 coord);
 private:

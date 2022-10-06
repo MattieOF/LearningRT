@@ -14,6 +14,8 @@ public:
 		if (ImGui::Button("Render Once") || m_KeepRendering)
 			Render();
 		ImGui::Checkbox("Keep Rendering", &m_KeepRendering);
+		ImGui::DragFloat3("Camera Position", &m_Renderer.rayOrigin[0], 0.1f);
+		ImGui::DragFloat("Sphere Radius", &m_Renderer.radius, 0.05f);
 		ImGui::Text("Viewport size is %ix%i (total pixels: %i)", m_ViewportWidth, m_ViewportHeight, m_ViewportWidth * m_ViewportHeight);
 		ImGui::Text("Last render took %.3fms", m_LastRenderTime);
 		ImGui::End();

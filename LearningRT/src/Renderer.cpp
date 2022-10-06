@@ -20,8 +20,6 @@ void Renderer::Render()
 
 uint32_t Renderer::PerPixel(glm::vec2 coord)
 {
-	float radius = 0.5f;
-	glm::vec3 rayOrigin(0, 0, 2);
 	glm::vec3 rayDirection(coord.x, coord.y, 1.0f);
 
 	float a = glm::dot(rayDirection, rayDirection);
