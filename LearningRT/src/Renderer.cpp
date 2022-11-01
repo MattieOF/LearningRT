@@ -1,7 +1,8 @@
 #include "Renderer.h"
 
-#include "Walnut/Random.h"
+#include "Walnut/Input/Input.h"
 
+#include "Utils.h"
 
 void Renderer::Render()
 {
@@ -11,14 +12,16 @@ void Renderer::Render()
 		{
 			glm::vec2 coord = { static_cast<float>(x) / static_cast<float>(m_FinalImage->GetWidth()), static_cast<float>(y) / static_cast<float>(m_FinalImage->GetHeight()) };
 			coord = coord * 2.0f - 1.0f; // Remap from 0->1 to -1->1
-			m_ImageData[x + y * m_FinalImage->GetWidth()] = PerPixel(coord);
+			glm::vec4 color = PerPixel(coord);
+			color = glm::clamp(color, glm::vec4(0.0f), glm::vec4(1.0f));
+			m_ImageData[x + y * m_FinalImage->GetWidth()] = Utils::Vec4ToABGRInt(color);
 		}
 	}
 
 	m_FinalImage->SetData(m_ImageData);
 }
 
-uint32_t Renderer::PerPixel(glm::vec2 coord)
+glm::vec4 Renderer::PerPixel(glm::vec2 coord)
 {
 	glm::vec3 rayDirection(coord.x, coord.y, 1.0f);
 
@@ -32,11 +35,12 @@ uint32_t Renderer::PerPixel(glm::vec2 coord)
 	if (discriminant >= 0)
 	{
 		// We hit the circle, color with a basic UV representation so it looks cool
-		uint8_t r = static_cast<uint8_t>((coord.x + 1) / 2 * 255.0f);
-		uint8_t g = static_cast<uint8_t>((coord.y + 1) / 2 * 255.0f);
-		return 0xFF000000 | g << 8 | r;
+		float r = (coord.x + 1) / 2;
+		float g = (coord.y + 1) / 2;
+		return {r, g, 0, 1};
 	}
-	return 0xFF000000; // No hit; return black
+
+	return {0, 0, 0, 1};
 }
 
 void Renderer::OnResize(uint32_t width, uint32_t height)
